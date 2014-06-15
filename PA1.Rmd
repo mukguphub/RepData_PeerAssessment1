@@ -4,51 +4,41 @@
 1. Load the data (i.e. read.csv())
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 ```{r}
-library(xtable)
 data <- read.csv("activity.csv")
-```
-
-Summary of the Raw Data
-```{r}
-summary(data)
-str(data)
 ```
 
 
 ## What is mean total number of steps taken per day? 
 For this part of the assignment, you can ignore the missing values in the dataset.
-```{r}
-data <- data[complete.cases(data),]
-```
 
 - Make a histogram of the total number of steps taken each day
 ```{r, fig.height=8, fig.width=10}
-  stepsInDays <- aggregate(data$steps,list(date = data$date), sum)
-  plot(x=stepsInDays[,1],y=stepsInDays[,2],type="h",main ="Number of Steps Per day",
-       xlab = "Date",ylab="Number of Steps")
+  totalSteps  <- aggregate(steps ~ date, data = data, sum, na.rm = TRUE)
+  hist(totalSteps$steps)
 ```
 
 - Calculate and report the mean and median total number of steps taken per day
 ```{r}
-  daysMean <- aggregate(data$steps,list(date = data$date), mean)
-  daysMedian <- aggregate(data$steps,list(date = data$date), median)
-  mmtable <- cbind(daysMean,daysMedian[,2])
-  names(mmtable) <- c("Date","Mean","Median")
-  mmtable 
+  stepsMean <- mean(totalSteps$steps)
+  stepsMedian <- median(totalSteps$steps) 
 ```
+- The **mean** total number of steps taken per day is `r stepsMean` steps.
+- The **median** total number of steps taken per day is `r stepsMedian` steps.
+
 ## What is the average daily activity pattern?
 - Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r}
-stepsPerInterval <- aggregate(data$steps,list(interval = data$interval), mean)
+
+```{r, fig.height=8, fig.width=10}
+stepsPerInterval <- aggregate( steps ~ interval,data=data, mean,na.rm = TRUE)
 plot(x=stepsPerInterval[,1],y=stepsPerInterval[,2],type="l",main ="Average Number of Steps",
        xlab = "Interval",ylab="Average")
 ```
 - Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 ```{r}
-  MaxNumberofSteps <- with(stepsPerInterval,interval[x==max(x)])
+  MaxNumberofSteps <- stepsPerInterval[which.max(stepsPerInterval$steps), ]$interval
 ```
+It is the **`r MaxNumberofSteps`th** interval.
 
-- **Answer :** Max Number of Steps is in interval **`r MaxNumberofSteps`**.
 
 ## Imputing missing values
 
